@@ -20,7 +20,6 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
 
     // Scene setup
     const scene = new THREE.Scene();
-    // scene.background = new THREE.Color(0x111111);
     sceneRef.current = scene;
 
     // Camera setup
