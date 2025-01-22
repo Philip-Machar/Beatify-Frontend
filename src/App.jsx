@@ -170,7 +170,7 @@ export default function AudioRecognition() {
                     : 'text-gray-400 hover:text-gray-200'
                 }`}
               >
-                Humming Recognition
+                Melody Recognition
               </button>
             </div>
           </div>
