@@ -176,7 +176,7 @@ export default function AudioRecognition() {
           </div>
 
           {/* Visualizer Container */}
-          <div className="w-full h-[300px] aspect-video bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-gray-800/50">
+          <div className="w-full h-[300px] aspect-video bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-gray-800/50 flex justify-center items-center">
             <AudioVisualizer 
               isRecording={isRecording}
               analyzerRef={analyzerRef}
