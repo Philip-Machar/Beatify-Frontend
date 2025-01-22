@@ -48,9 +48,9 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
     const renderScene = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(containerRef.current.clientWidth, containerRef.current.clientHeight),
-      0.0, // start with no bloom
-      0.5,  // radius
-      0.2   // threshold
+      0.0,
+      0.5,
+      0.2
     );
     bloomPassRef.current = bloomPass;
 
@@ -64,7 +64,7 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
     const uniforms = {
       u_time: { value: 0 },
       u_frequency: { value: 0 },
-      u_intensity: { value: 0 }, // New uniform for overall intensity
+      u_intensity: { value: 0 },
       u_position: { value: new THREE.Vector3() }
     };
 
@@ -168,14 +168,21 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
         void main() {
           vPosition = position;
           
-          // Create more pronounced noise effect
-          float noise = 3.0 * pnoise(position + u_time * 0.5, vec3(10.0));
+          // Create moderate noise effect
+          float noise = 2.5 * pnoise(position + u_time * 0.4, vec3(10.0));
           
-          // Amplify the displacement based on frequency and intensity
-          float displacement = (u_frequency / 25.0) * (noise * 0.5) * (1.0 + u_intensity);
+          // Apply smoother scaling to frequency for better response
+          float frequencyFactor = u_frequency / 128.0; // Less aggressive scaling
           
-          // Apply the displacement along the normal
-          vec3 newPosition = position + normal * displacement;
+          // Calculate base displacement with better volume response
+          float displacement = (noise * 0.8) * (0.2 + frequencyFactor);
+          
+          // Scale displacement based on distance from center to prevent overflow
+          float distanceFromCenter = length(position) / 5.0;
+          float boundaryFactor = 1.0 - smoothstep(0.8, 1.0, distanceFromCenter);
+          
+          // Apply final displacement with boundary control
+          vec3 newPosition = position + normal * displacement * boundaryFactor;
           
           gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
         }
@@ -220,18 +227,18 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
         analyzerRef.current.getByteFrequencyData(dataArrayRef.current);
         const average = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
         
-        // Enhanced frequency response
-        frequency = average * 2.5; // Amplified frequency effect
+        // More balanced frequency response
+        frequency = average * 1.8; // Moderate amplification
         
         // Calculate intensity for bloom and other effects
         intensity = average / 255;
         
         // Update bloom based on audio intensity
-        bloomPassRef.current.strength = intensity * 1.5;
+        bloomPassRef.current.strength = intensity * 1.2;
       } else {
-        // Decay effects when not recording
-        material.uniforms.u_frequency.value *= 0.95;
-        bloomPassRef.current.strength *= 0.95;
+        // Smoother decay effects when not recording
+        material.uniforms.u_frequency.value *= 0.98;
+        bloomPassRef.current.strength *= 0.98;
       }
 
       // Update uniforms
