@@ -291,7 +291,7 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
   return (
     <div 
       ref={containerRef} 
-      className="w-full h-64 rounded-lg"
+      className="w-full h-full rounded-lg"
     />
   );
 };
