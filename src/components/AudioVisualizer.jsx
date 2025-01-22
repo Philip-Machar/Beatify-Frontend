@@ -224,17 +224,17 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
       let frequency = 0;
 
       if (isRecording && analyzerRef.current && dataArrayRef.current) {
-        analyzerRef.current.getByteFrequencyData(dataArrayRef.current);
-        const average = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
-        
-        // More balanced frequency response
-        frequency = average * 1.8; // Moderate amplification
-        
-        // Calculate intensity for bloom and other effects
-        intensity = average / 255;
-        
-        // Update bloom based on audio intensity
-        bloomPassRef.current.strength = intensity * 1.2;
+          analyzerRef.current.getByteFrequencyData(dataArrayRef.current);
+          const average = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
+          
+          // More balanced frequency response
+          frequency = average * 1.8; // Moderate amplification
+          
+          // Calculate intensity for bloom and other effects
+          intensity = average / 255;
+          
+          // Update bloom based on audio intensity
+          bloomPassRef.current.strength = intensity * 1.2;
       } else {
         // Smoother decay effects when not recording
         material.uniforms.u_frequency.value *= 0.98;
@@ -292,7 +292,7 @@ const AudioVisualizer = ({ isRecording, analyzerRef, dataArrayRef }) => {
   return (
     <div 
       ref={containerRef} 
-      className="w-full h-64 rounded-lg bg-gray-900"
+      className="w-full h-64 rounded-lg"
     />
   );
 };

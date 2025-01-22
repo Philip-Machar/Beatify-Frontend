@@ -145,74 +145,120 @@ export default function AudioRecognition() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <div className="space-y-4">
-        <div className="flex space-x-4">
+    <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* Top Section */}
+        <div className="flex flex-col items-center space-y-6">
+          {/* Mode Toggle */}
+          <div className="bg-gray-900/50 backdrop-blur-sm p-1 rounded-full">
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setRecordType('audio')}
+                className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                  recordType === 'audio'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Song Recognition
+              </button>
+              <button
+                onClick={() => setRecordType('humming')}
+                className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                  recordType === 'humming'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Humming Recognition
+              </button>
+            </div>
+          </div>
+
+          {/* Visualizer Container */}
+          <div className="w-full h-[300px] aspect-video bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-gray-800/50">
+            <AudioVisualizer 
+              isRecording={isRecording}
+              analyzerRef={analyzerRef}
+              dataArrayRef={dataArrayRef}
+            />
+          </div>
+
+          {/* Record Button */}
           <button
-            onClick={() => setRecordType('audio')}
-            className={`px-4 py-2 rounded-lg flex items-center ${
-              recordType === 'audio' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isProcessing}
+            className={`w-full max-w-md px-8 py-4 rounded-full font-medium transition-all duration-300 
+              ${isRecording 
+                ? 'bg-red-500 hover:bg-red-600 shadow-red-500/25'
+                : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25'
+              } 
+              shadow-lg disabled:opacity-50 disabled:cursor-not-allowed
+              transform hover:scale-[1.02] active:scale-[0.98]`}
           >
-            <Music className="mr-2 h-5 w-5" /> 
-            Song Recognition
-          </button>
-          <button
-            onClick={() => setRecordType('humming')}
-            className={`px-4 py-2 rounded-lg flex items-center ${
-              recordType === 'humming' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            <Mic className="mr-2 h-5 w-5" /> 
-            Humming Recognition
+            {isProcessing ? (
+              <span className="flex items-center justify-center">
+                <Loader2 className="animate-spin mr-2" />
+                Processing...
+              </span>
+            ) : isRecording ? (
+              <span className="flex items-center justify-center">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-2" />
+                Stop Recording
+              </span>
+            ) : (
+              'Start Recording'
+            )}
           </button>
         </div>
 
-        <AudioVisualizer 
-          isRecording={isRecording}
-          analyzerRef={analyzerRef}
-          dataArrayRef={dataArrayRef}
-        />
+        {/* Results Section */}
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200">
+            {error}
+          </div>
+        )}
 
-        <button
-          onClick={isRecording ? stopRecording : startRecording}
-          className={`w-full p-4 rounded-lg transition-colors ${
-            isRecording 
-              ? 'bg-red-500 hover:bg-red-600' 
-              : 'bg-blue-500 hover:bg-blue-600'
-          } text-white flex items-center justify-center`}
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <><Loader2 className="animate-spin mr-2" /> Processing...</>
-          ) : isRecording ? (
-            <span className="flex items-center">
-              <span className="animate-pulse mr-2">⚫</span>
-              Stop Recording
-            </span>
-          ) : (
-            <>Start Recording</>
-          )}
-        </button>
+        {result && (
+          <div className="space-y-4">
+            {(result.metadata?.music || result.metadata?.humming || []).map((track, index) => (
+              <div 
+                key={index}
+                className="p-6 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800/50 
+                          transition-all duration-300 hover:border-gray-700/50 hover:bg-gray-900/70"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-semibold text-white">{track.title}</h3>
+                    <p className="text-gray-400">{track.artists?.[0]?.name || 'Unknown Artist'}</p>
+                    {track.album?.name && (
+                      <p className="text-gray-500 text-sm">{track.album.name}</p>
+                    )}
+                  </div>
+                  {track.score && (
+                    <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
+                      {Math.round(track.score)}% Match
+                    </span>
+                  )}
+                </div>
+                
+                {track.external_metadata?.spotify && (
+                  <a
+                    href={`https://open.spotify.com/track/${track.external_metadata.spotify.track.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center px-4 py-2 bg-green-600/20 text-green-400 
+                             rounded-full text-sm hover:bg-green-600/30 transition-colors duration-300"
+                  >
+                    Open in Spotify
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      {result && (
-        <div className="space-y-4">
-          {displayResults()}
-        </div>
-      )}
     </div>
   );
 }
-
 
