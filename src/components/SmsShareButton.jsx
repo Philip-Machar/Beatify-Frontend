@@ -20,14 +20,14 @@ const SmsShareButton = ({ songDetails }) => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/send-sms', {
+      const response = await fetch('https://beatify-backend.onrender.com/api/send-sms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           phoneNumber,
-          message: `Check out this song: ${songDetails.title} by ${songDetails.artists?.[0]?.name || 'Unknown Artist'}${songDetails.album?.name ? ` from the album ${songDetails.album.name}` : ''}`
+          message: `Checki hii ngoma noma: ${songDetails.title} by ${songDetails.artists?.[0]?.name || 'Unknown Artist'}${songDetails.album?.name ? ` from the album ${songDetails.album.name}` : ''}`
         })
       });
 
