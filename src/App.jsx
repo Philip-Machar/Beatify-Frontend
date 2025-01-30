@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Music, Loader2 } from 'lucide-react';
 import AudioVisualizer from './components/AudioVisualizer';
+import SmsShareButton from './components/SmsShareButton';
 
 export default function AudioRecognition() {
   const [isRecording, setIsRecording] = useState(false);
@@ -108,42 +109,6 @@ export default function AudioRecognition() {
     }
   };
 
-  const displayResults = () => {
-    if (!result?.metadata) {
-      return <p className="text-gray-700">No matches found. Please try again.</p>;
-    }
-
-    // Handle both direct music matches and humming matches
-    const matches = result.metadata.music || result.metadata.humming || [];
-    
-    if (matches.length === 0) {
-      return <p className="text-gray-700">No matches found. Please try again.</p>;
-    }
-
-    return matches.map((track, index) => (
-      <div key={index} className="p-4 bg-white shadow rounded-lg mb-4">
-        <h3 className="font-bold text-lg">{track.title}</h3>
-        <p className="text-gray-600">Artist: {track.artists?.[0]?.name || 'Unknown'}</p>
-        {track.album?.name && (
-          <p className="text-gray-600">Title: {track.album.name}</p>
-        )}
-        {track.score && (
-          <p className="text-gray-600">Match Score: {Math.round(track.score)}%</p>
-        )}
-        {track.external_metadata?.spotify && (
-          <a
-            href={`https://open.spotify.com/track/${track.external_metadata.spotify.track.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-700 mt-2 inline-block"
-          >
-            Open in Spotify
-          </a>
-        )}
-      </div>
-    ));
-  };
-
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -243,15 +208,18 @@ export default function AudioRecognition() {
                 </div>
                 
                 {track.external_metadata?.spotify && (
-                  <a
-                    href={`https://open.spotify.com/track/${track.external_metadata.spotify.track.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 inline-flex items-center px-4 py-2 bg-green-600/20 text-green-400 
-                             rounded-full text-sm hover:bg-green-600/30 transition-colors duration-300"
-                  >
-                    Open in Spotify
-                  </a>
+                  <>
+                    <a
+                      href={`https://open.spotify.com/track/${track.external_metadata.spotify.track.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center px-4 py-2 bg-green-600/20 text-green-400 
+                              rounded-full text-sm hover:bg-green-600/30 transition-colors duration-300"
+                    >
+                      Open in Spotify
+                    </a>
+                    <SmsShareButton songDetails={track} />
+                  </>
                 )}
               </div>
             ))}
